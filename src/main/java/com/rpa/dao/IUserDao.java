@@ -4,5 +4,5 @@ import com.rpa.pojo.User;
 
 public interface IUserDao {
 	
-	public User selectByPrimaryKey(int userid);
+	public User selectByPrimaryKey(String userid);
 }
