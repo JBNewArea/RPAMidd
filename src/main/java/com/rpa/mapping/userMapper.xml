@@ -7,7 +7,7 @@
  	<result property="password" column="password"/>
  	<result property="age" column="age"/>
  </resultMap>
-<select id="getUserById" resultType="userResultMap">
+<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="userResultMap">
 	select * from user_t
 </select>
 </mapper>

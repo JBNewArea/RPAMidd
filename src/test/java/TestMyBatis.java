@@ -21,7 +21,5 @@ public class TestMyBatis {
 	
 	@Test
 	public void test(){
-		User user = userservice.getUserById(1);
-		logger.info(user.getAge());
 	}
 }
