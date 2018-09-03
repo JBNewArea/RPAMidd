@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rpa.dao.IProjectDeclareDao">
+<resultMap type="com.rpa.pojo.ProjectDeclare" id="projectResultMap">
+	<id property="id" column="id"/>
+	<result property="projectType" column="project_Type"/>
+	<result property="projectName" column="project_Name"/>
+	<result property="mainProjectName" column="mainProject_Name"/>
+	<result property="guanli" column="guanli"/>
+	<result property="giveDate" column="give_Date"/>
+	<result property="giveDept" column="give_Dept"/>
+	<result property="startPlanDate" column="startPlan_Date"/>
+	<result property="endPlanDate" column="endPlan_Date"/>
+	<result property="buildPlace" column="buildPlace"/>
+	<result property="guobiao" column="guobiao"/>
+	<result property="buildDetailPlace" column="buildDetailPlace"/>
+	<result property="projectAttribute" column="projectAttribute"/>
+	<result property="buildNature" column="buildNature"/>
+	<result property="totalInvestment" column="total_Investment"/>
+	<result property="scaleandinfo" column="scaleandinfo"/>
+	<result property="siteArea" column="siteArea"/>
+	<result property="newSiteArea" column="newSiteArea"/>
+	<result property="farmingSiteArea" column="farmingSiteArea"/>
+	<result property="projectPrincipal" column="projectPrincipal"/>
+	<result property="capitalSource" column="capitalSource"/>
+	<result property="financialCapitalSource" column="financialCapitalSource"/>
+	<result property="isTechnically" column="isTechnically"/>
+	<result property="putClassify" column="putClassify"/>
+	<result property="putCatalog" column="putCatalog"/>
+	<result property="projectLegalDetp" column="projectLegalDetp"/>
+	<result property="projectLegalLicenseType" column="projectLegalLicenseType"/>
+	<result property="projectLegalLicenseNum" column="projectLegalLicenseNum"/>
+	<result property="linkman" column="linkman"/>
+	<result property="linktel" column="linktel"/>
+	<result property="declareDate" column="declareDate"/>
+	<result property="projectState" column="projectState"/>
+	<result property="projectCode" column="projectCode"/>
+	<result property="manageStatus" column="manageStatus"/>
+</resultMap>
+<sql id="Base_Column_List" >
+    a.project_Type,
+    a.project_Type,
+    a.project_Name,
+    a.mainProject_Name,
+    a.guanli,
+    a.give_Date,
+    a.give_Dept,
+    a.startPlan_Date,
+    a.endPlan_Date,
+    a.buildPlace,
+    a.guobiao,
+    a.buildDetailPlace,
+    a.projectAttribute,
+    a.buildNature,
+    a.total_Investment,
+    a.scaleandinfo,
+    a.siteArea,
+    a.newSiteArea,
+    a.farmingSiteArea,
+    a.projectPrincipal,
+    a.capitalSource,
+    a.financialCapitalSource,
+    a.isTechnically,
+    a.putClassify,
+    a.putCatalog,
+    a.projectLegalDetp,
+    a.projectLegalLicenseType,
+    a.projectLegalLicenseNum,
+    a.linkman,
+    a.linktel,
+    a.declareDate,
+    a.projectState,
+    a.projectCode,
+    a.manageStatus
+</sql>
+<select id="queryList" resultMap="projectResultMap">
+	select <include refid="Base_Column_List"/>
+	from project_declare a where 1=1 
+	<if test="projectCode !=null and projectCode !=''">
+		and a.projectCode  = #{projectCode}
+	</if>
+</select>
+<insert id="insert">
+	INSERT INTO project_declare(
+	id,
+	project_Type,
+	project_Name,
+	mainProject_Name,
+	guanli,
+	give_Date,
+	give_Dept,
+	startPlan_Date,
+	endPlan_Date,
+	buildPlace,
+	guobiao,
+	buildDetailPlace,
+	projectAttribute,
+	buildNature,
+	total_Investment,
+	scaleandinfo,
+	siteArea,
+	newSiteArea,
+	farmingSiteArea,
+	projectPrincipal,
+	capitalSource,
+	financialCapitalSource,
+	isTechnically,
+	putClassify,
+	putCatalog,
+	projectLegalDetp,
+	projectLegalLicenseType,
+	projectLegalLicenseNum,
+	linkman,
+	linktel,
+	declareDate,
+	projectState,
+	projectCode,
+	manageStatus
+	)VALUES(
+	#{id},
+	#{projectType},
+	#{projectName},
+	#{mainProjectName},
+	#{guanli},
+	#{giveDate},
+	#{giveDept},
+	#{startPlanDate},
+	#{endPlanDate},
+	#{buildPlace},
+	#{guobiao},
+	#{buildDetailPlace},
+	#{projectAttribute},
+	#{buildNature},
+	#{totalInvestment},
+	#{scaleandinfo},
+	#{siteArea},
+	#{newSiteArea},
+	#{farmingSiteArea},
+	#{projectPrincipal},
+	#{capitalSource},
+	#{financialCapitalSource},
+	#{isTechnically},
+	#{putClassify},
+	#{putCatalog},
+	#{projectLegalDetp},
+	#{projectLegalLicenseType},
+	#{projectLegalLicenseNum},
+	#{linkman},
+	#{linktel},
+	#{declareDate},
+	#{projectState},
+	#{projectCode},
+	#{manageStatus}
+	)
+</insert>
+</mapper>

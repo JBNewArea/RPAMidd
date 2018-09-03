@@ -48,7 +48,7 @@
         <property name="maxInMemorySize" value="40960" />  
     </bean> 
     <!-- 定义一个任务类 -->
-    <bean id="myJob" class="com.rpa.task.TimeTask"></bean>
+    <bean id="myJob" class="com.rpa.task.ProjectTimeTask"></bean>
 
     <!-- jobDetail -->
     <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -60,7 +60,7 @@
     <!-- 定义trigger 触发器 -->
     <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="jobDetail"></property>
-        <property name="cronExpression" value="0 0/1 * * * ?"></property>
+        <property name="cronExpression" value="*/15 * * * * ?"></property>
     </bean>
 
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">

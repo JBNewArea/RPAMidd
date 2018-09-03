@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rpa.dao.ILogInfoDao">
+<resultMap type="com.rpa.pojo.LogInfo" id="logInfoResultMap">
+<id property="id" column="id"/>
+<result property="logId" column="log_id"/>
+<result property="status" column="status"/>
+<result property="content" column="content"/>
+<result property="createTime" column="create_time"/>
+</resultMap>
+<insert id="insert">
+insert into xjl_log_info(
+id,
+log_id,
+status,
+content,
+create_time
+)values(
+#{id},
+#{logId},
+#{status},
+#{content},
+#{createTime}
+)
+</insert>
+</mapper>
