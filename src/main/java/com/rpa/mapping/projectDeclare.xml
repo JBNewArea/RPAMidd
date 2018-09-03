@@ -36,6 +36,36 @@
 	<result property="projectState" column="projectState"/>
 	<result property="projectCode" column="projectCode"/>
 	<result property="manageStatus" column="manageStatus"/>
+	<result property="isNationalSecurity" column="isNationalSecurity"/>
+	<result property="investmentWay" column="investmentWay"/>
+	<result property="otherInvestment" column="otherInvestment"/>
+	<result property="entryType" column="entryType"/>
+	<result property="policyClauses" column="policyClauses"/>
+	<result property="industryInvolved" column="industryInvolved"/>
+	<result property="totalConvertDollar" column="totalConvertDollar"/>
+	<result property="totalParitiesRMBorDollar" column="totalParitiesRMBorDollar"/>
+	<result property="projectCapital" column="projectCapital"/>
+	<result property="capitalConvertDollar" column="capitalConvertDollar"/>
+	<result property="capitalParitiesRMBORDollar" column="capitalParitiesRMBORDollar"/>
+	<result property="newFixedAssets" column="newFixedAssets"/>
+	<result property="landAcquisition" column="landAcquisition"/>
+	<result property="sumSiteArea" column="sumSiteArea"/>
+	<result property="sumCoveredArea" column="sumCoveredArea"/>
+	<result property="isAddEquipment" column="isAddEquipment"/>
+	<result property="importedEquipmentAndMoney" column="importedEquipmentAndMoney"/>
+	<result property="investorName" column="investorName"/>
+	<result property="registerStateArea" column="registerStateArea"/>
+	<result property="contributiveLimit" column="contributiveLimit"/>
+	<result property="ratioOfInvestments" column="ratioOfInvestments"/>
+	<result property="waysOfInvestment" column="waysOfInvestment"/>
+	<result property="projectDeptIsBuild" column="projectDeptIsBuild"/>
+	<result property="projectDeptName" column="projectDeptName"/>
+	<result property="projectDeptType" column="projectDeptType"/>
+	<result property="businessScope" column="businessScope"/>
+	<result property="linkNumber" column="linkNumber"/>
+	<result property="email" column="email"/>
+	<result property="checkCatalog" column="checkCatalog"/>
+	<result property="checkCatalogClassify" column="checkCatalogClassify"/>
 </resultMap>
 <sql id="Base_Column_List" >
     a.project_Type,
@@ -71,13 +101,46 @@
     a.declareDate,
     a.projectState,
     a.projectCode,
-    a.manageStatus
+    a.manageStatus,
+    a.isNationalSecurity,
+    a.investmentWay,
+    a.otherInvestment,
+    a.entryType,
+    a.policyClauses,
+    a.industryInvolved,
+    a.totalConvertDollar,
+    a.totalParitiesRMBorDollar,
+    a.projectCapital,
+    a.capitalConvertDollar,
+    a.capitalParitiesRMBORDollar,
+    a.newFixedAssets,
+    a.landAcquisition,
+    a.sumSiteArea,
+    a.sumCoveredArea,
+    a.isAddEquipment,
+    a.importedEquipmentAndMoney,
+    a.investorName,
+    a.registerStateArea,
+    a.contributiveLimit,
+    a.ratioOfInvestments,
+    a.waysOfInvestment,
+    a.projectDeptIsBuild,
+    a.projectDeptName,
+    a.projectDeptType,
+    a.businessScope,
+    a.linkNumber,
+    a.email,
+    a.checkCatalog,
+    a.checkCatalogClassify
 </sql>
 <select id="queryList" resultMap="projectResultMap">
 	select <include refid="Base_Column_List"/>
 	from project_declare a where 1=1 
 	<if test="projectCode !=null and projectCode !=''">
 		and a.projectCode  = #{projectCode}
+	</if>
+	<if test="declareDate !=null and declareDate !=''">
+		and a.declareDate  = #{declareDate}
 	</if>
 </select>
 <insert id="insert">
@@ -115,7 +178,37 @@
 	declareDate,
 	projectState,
 	projectCode,
-	manageStatus
+	manageStatus,
+	isNationalSecurity,
+	investmentWay,
+	otherInvestment,
+	entryType,
+	policyClauses,
+	industryInvolved,
+	totalConvertDollar,
+	totalParitiesRMBorDollar,
+	projectCapital,
+	capitalConvertDollar,
+	capitalParitiesRMBORDollar,
+	newFixedAssets,
+	landAcquisition,
+	sumSiteArea,
+	sumCoveredArea,
+	isAddEquipment,
+	importedEquipmentAndMoney,
+	investorName,
+	registerStateArea,
+	contributiveLimit,
+	ratioOfInvestments,
+	waysOfInvestment,
+	projectDeptIsBuild,
+	projectDeptName,
+	projectDeptType,
+	businessScope,
+	linkNumber,
+	email,
+	checkCatalog,
+	checkCatalogClassify
 	)VALUES(
 	#{id},
 	#{projectType},
@@ -150,7 +243,37 @@
 	#{declareDate},
 	#{projectState},
 	#{projectCode},
-	#{manageStatus}
+	#{manageStatus},
+	#{isNationalSecurity},
+	#{investmentWay},
+	#{otherInvestment},
+	#{entryType},
+	#{policyClauses},
+	#{industryInvolved},
+	#{totalConvertDollar},
+	#{totalParitiesRMBorDollar},
+	#{projectCapital},
+	#{capitalConvertDollar},
+	#{capitalParitiesRMBORDollar},
+	#{newFixedAssets},
+	#{landAcquisition},
+	#{sumSiteArea},
+	#{sumCoveredArea},
+	#{isAddEquipment},
+	#{importedEquipmentAndMoney},
+	#{investorName},
+	#{registerStateArea},
+	#{contributiveLimit},
+	#{ratioOfInvestments},
+	#{waysOfInvestment},
+	#{projectDeptIsBuild},
+	#{projectDeptName},
+	#{projectDeptType},
+	#{businessScope},
+	#{linkNumber},
+	#{email},
+	#{checkCatalog},
+	#{checkCatalogClassify}
 	)
 </insert>
 </mapper>

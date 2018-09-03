@@ -18,9 +18,6 @@ public class ProjectUtils {
 	
 	public final static String BYONE_URL="http://10.101.79.24:11002/zwService/";
 	
-	
-	
-	
 	/**
 	 * 接口项目地址
 	 */
@@ -46,4 +43,9 @@ public class ProjectUtils {
 	
 	public final static String  SUCCESS_CODE="000000";
 	public final static String  ERROR_CODE="01111";
+	
+	/**
+	 * 事项 - 企业投资建设固定资产投资项目备案
+	 */
+	public final static String ISTECHNICALLY="否";
 }

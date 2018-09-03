@@ -37,13 +37,16 @@ public class ProjectTimeTask {
 	private Log log = null;
 	private LogInfo logInfo = null;
 	private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+	
+	private SimpleDateFormat projectParams = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
 	public void execute(){
 		System.out.println("进入");
-//		String logres = login();
-//		if(ProjectUtils.SUCCESS_CODE.equals(logres)){
-//			queryList();
-//		}
-		doDeclare();
+		doLog("project - execute","success:"+df.format(new Date()),"0");
+		String logres = login();
+		if(ProjectUtils.SUCCESS_CODE.equals(logres)){
+			queryList();
+		}
+		//doDeclare();
 	}
 	
 	
@@ -68,7 +71,7 @@ public class ProjectTimeTask {
 	 */
 	@SuppressWarnings("unchecked")
 	public  void queryList(){
-		String params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page=1";
+		String params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page=1";//&datestart="+projectParams.format(new Date())
 		try {
 			String pageRes = HttpRequest.sendGet(ProjectUtils.LIST_URL, params);
 			//得到页数
@@ -77,18 +80,16 @@ public class ProjectTimeTask {
 			if(ProjectUtils.SUCCESS_CODE.equals(String.valueOf(jsonObject.get("rtnCode")))){
 				JSONObject pageObj = JSONObject.fromObject(jsonObject.get("data"));
 				int allPage = Integer.parseInt(String.valueOf(pageObj.get("totlePage")));
-				System.out.println(allPage);
 				String _res="";
 				if(allPage > 0){
 					//得到全部的页数，遍历请求地址
 					for (int i = 1; i <= allPage; i++) {
-						params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page="+i;//&datestart=2018-08-29
+						params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page="+i;//&datestart="+projectParams.format(new Date())
 						_res = HttpRequest.sendGet(ProjectUtils.LIST_URL, params);
 						JSONObject _jsonObject =JSONObject.fromObject(_res);//得到本页列表
 						//判断列表不为空
 						if(null != _jsonObject){
 						    JSONObject _jsonObject1 = JSONObject.fromObject(_jsonObject.get("data"));
-						    System.out.println(_jsonObject1.get("proList"));
 						   //判断列表不为空 data
 						    if(null != _jsonObject1){
 						    	 JSONArray myJsonArray = JSONArray.fromObject(String.valueOf(_jsonObject1.get("proList")));
@@ -174,6 +175,9 @@ public class ProjectTimeTask {
 	public void doDeclare(){
 		ProjectDeclare p = new ProjectDeclare();
 		List<Map<String,String>> filelist = doFaceMatter();
+		//增加测试时间参数
+		SimpleDateFormat _projectParams = new SimpleDateFormat("yyyy/MM/dd");
+		p.setDeclareDate(_projectParams.format(new Date()));
 		//全量执行
 		List<ProjectDeclare> list =  projectDeclareService.queryList(p);
 		if(!list.isEmpty()){
@@ -195,8 +199,6 @@ public class ProjectTimeTask {
 				        nameValuePairs.add(new BasicNameValuePair("materialList[0].materialGetId",""));
 				        nameValuePairs.add(new BasicNameValuePair("materialList[0].getMode",""));
 					}
-					//事项信息
-			        nameValuePairs.add(new BasicNameValuePair("trans.id","e8f74efb01ce443faf91f77c064ad781"));
 			        nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationName",projectDeclare.getProjectLegalDetp()));
 			        nameValuePairs.add(new BasicNameValuePair("applicantDocumentType","2"));
 			        nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationDocumentNumber",projectDeclare.getProjectLegalLicenseNum()));
@@ -207,7 +209,7 @@ public class ProjectTimeTask {
 			        nameValuePairs.add(new BasicNameValuePair("agentName",""));//当前用户
 			        nameValuePairs.add(new BasicNameValuePair("agentDocumentType",""));//代理人证件类型
 			        nameValuePairs.add(new BasicNameValuePair("agentDocumentNumber",""));//代理人证件号
-			        nameValuePairs.add(new BasicNameValuePair("legalRepresentative",projectDeclare.getLinkman()));
+			        nameValuePairs.add(new BasicNameValuePair("legalRepresentative",""));
 			        nameValuePairs.add(new BasicNameValuePair("status","0"));//代办系统发起的办件 默认状态为已受理 状态码为6
 			        nameValuePairs.add(new BasicNameValuePair("express.name",""));
 			        nameValuePairs.add(new BasicNameValuePair("express.phone",""));
@@ -221,12 +223,13 @@ public class ProjectTimeTask {
 			        nameValuePairs.add(new BasicNameValuePair("isNationSecurity",""));//是否涉及国家安全
 			        nameValuePairs.add(new BasicNameValuePair("projectAttribute",projectDeclare.getProjectAttribute()));//项目属性
 			        nameValuePairs.add(new BasicNameValuePair("investmentMethod",""));//投资方式
-			        nameValuePairs.add(new BasicNameValuePair("scaleandinfo",""));//项目内容
+			        nameValuePairs.add(new BasicNameValuePair("scaleandinfo",projectDeclare.getScaleandinfo()));//项目内容
 			        nameValuePairs.add(new BasicNameValuePair("statusFirst",projectDeclare.getManageStatus()));//办理状态
 			        nameValuePairs.add(new BasicNameValuePair("buildDetailPlace",projectDeclare.getBuildDetailPlace()));//项目详细地址
 			        nameValuePairs.add(new BasicNameValuePair("guanli",projectDeclare.getGuanli()));//所属行业
 			        nameValuePairs.add(new BasicNameValuePair("money",projectDeclare.getTotalInvestment()));//总投资
 			        nameValuePairs.add(new BasicNameValuePair("dollarMoney","")); //折合美元(万元)
+			        nameValuePairs.add(new BasicNameValuePair("dollarProjectCap","")); //折合美元(万元)
 			        nameValuePairs.add(new BasicNameValuePair("ExchangeMoney",""));//使用的汇率(人民币/美元)
 			        nameValuePairs.add(new BasicNameValuePair("ProjectCap",projectDeclare.getProjectPrincipal()));//项目本金
 			        nameValuePairs.add(new BasicNameValuePair("ExchangeProjectCap",""));//使用的汇率(人民币/美元)
@@ -263,7 +266,12 @@ public class ProjectTimeTask {
 			        nameValuePairs.add(new BasicNameValuePair("email",""));//电子邮件
 			        nameValuePairs.add(new BasicNameValuePair("fax","")); //传真
 					try {
-						Map<String,Object> ret = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+						//事项信息 - 企业投资建设固定资产投资项目备案
+						if(ProjectUtils.ISTECHNICALLY.equals(projectDeclare.getIsTechnically())){
+							 nameValuePairs.add(new BasicNameValuePair("trans.id","e8f74efb01ce443faf91f77c064ad781"));
+							 Map<String,Object> ret = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+						}
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.out.println(e.getMessage());
@@ -275,7 +283,7 @@ public class ProjectTimeTask {
 	}
 	
 	/**
-	 * 
+	 * 接口 - 得到对应事项 的所有材料
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
