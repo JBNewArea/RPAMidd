@@ -98,6 +98,8 @@ public class ProjectDeclare {
 	private String checkCatalogClassify;//核准目录分类
 	
 	
+	private String bjbh;//推送备案接受 - 办件编号
+	
 
 	public String getDeclareDate() {
 		return declareDate;
@@ -698,5 +700,12 @@ public class ProjectDeclare {
 	public void setCheckCatalogClassify(String checkCatalogClassify) {
 		this.checkCatalogClassify = checkCatalogClassify;
 	}
-	
+
+	public String getBjbh() {
+		return bjbh;
+	}
+
+	public void setBjbh(String bjbh) {
+		this.bjbh = bjbh;
+	}
 }

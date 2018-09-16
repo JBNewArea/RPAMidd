@@ -11,7 +11,7 @@
                         http://www.springframework.org/schema/mvc  
                         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
 	<!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制器 -->
-	<context:component-scan base-package="com.rpa" />
+	<context:component-scan base-package="com.rpa.web" />
 	<!--避免IE执行AJAX时，返回JSON出现下载文件 -->
 	<bean id="mappingJacksonHttpMessageConverter"
 		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
@@ -60,10 +60,9 @@
     <!-- 定义trigger 触发器 -->
     <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="jobDetail"></property>
-        <property name="cronExpression" value="0 0/20 5,14 * * ?"></property>
-        <!-- */5 * * * * ? -->
+        <property name="cronExpression" value="*/5 * * * * ?"></property>
+        <!--  0 0/20 5,18 * * ?-->
     </bean>
-
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="triggers">
            <list>

@@ -33,7 +33,7 @@ public class ProjectUtils {
 	 */
 	public final static String  IW_APIKEY="123";
 	public final static String  USERNAME="njjbxqcx";
-	public final static String  PWD="987654321";
+	public final static String  PWD="888888";
 	
 	
 	public final static String  IW_CMD_LOGIN="sysLogin";
@@ -48,4 +48,8 @@ public class ProjectUtils {
 	 * 事项 - 企业投资建设固定资产投资项目备案
 	 */
 	public final static String ISTECHNICALLY="否";
+	public final static String SP_SUCCESS="8888";
+	
+	public final static String PROJECT_ANTISTOP="统一社会信用";
+	public final static String PROJECT_ANTISTOP_1="其他";
 }

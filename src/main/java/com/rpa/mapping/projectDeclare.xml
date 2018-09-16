@@ -66,6 +66,7 @@
 	<result property="email" column="email"/>
 	<result property="checkCatalog" column="checkCatalog"/>
 	<result property="checkCatalogClassify" column="checkCatalogClassify"/>
+	<result property="bjbh" column="bjbh"/>
 </resultMap>
 <sql id="Base_Column_List" >
     a.project_Type,
@@ -276,4 +277,7 @@
 	#{checkCatalogClassify}
 	)
 </insert>
+<update id="updateBjbh">
+	update project_declare set bjbh = #{bjbh} where projectCode = #{projectCode}
+</update>
 </mapper>

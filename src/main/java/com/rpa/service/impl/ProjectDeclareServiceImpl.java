@@ -22,5 +22,9 @@ public class ProjectDeclareServiceImpl implements IProjectDeclareService{
 	public int insert(ProjectDeclare dec) {
 		return projectDeclareDao.insert(dec);
 	}
+	@Override
+	public int updateBjbh(ProjectDeclare dec) {
+		return projectDeclareDao.updateBjbh(dec);
+	}
 
 }

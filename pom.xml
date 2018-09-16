@@ -24,7 +24,6 @@
 		<httpclient.version>4.4.1</httpclient.version>
 		<commons.httpclient.version>3.1</commons.httpclient.version>
   </properties>
-  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -79,6 +78,11 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-beans</artifactId>
+             <version>${spring.version}</version>
+        </dependency>
 		<!-- mybatis核心包 -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -225,7 +229,7 @@
 			<version>2.3</version>
 			<classifier>jdk15</classifier>
 		</dependency>
-  </dependencies>
+    </dependencies>
   <build>
     <finalName>RPAMidda</finalName>
     <outputDirectory>RPAMidd/src/main/webapp/WEB-INF/classes/</outputDirectory>

@@ -64,7 +64,7 @@ public class HttpRequest {
 			System.out.println(key + "--->" + map.get(key));
 		}
 		// 定义 BufferedReader输入流来读取URL的响应
-		in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		in = new BufferedReader(new InputStreamReader(connection.getInputStream(),"UTF-8"));
 		String line;
 		while ((line = in.readLine()) != null) {
 			result += line;
@@ -166,16 +166,13 @@ public class HttpRequest {
 		}
 		return sendPost(url, paramStr);
 	}
-	public static Map<String,Object> send(String url,List<NameValuePair> nameValuePairs){
+	public static String send(String url,List<NameValuePair> nameValuePairs){
 		@SuppressWarnings({ "deprecation", "resource" })
 		HttpClient httpclient = new DefaultHttpClient();  
         HttpPost httppost = new HttpPost(url);  
         String strResult = ""; 
         JSONArray jsonArray = null;
         JSONObject sobj = null;
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put("success",false);
-        map.put("entity", "调用接口出错");
         try {
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"UTF-8"));
 			HttpResponse response;
@@ -184,20 +181,20 @@ public class HttpRequest {
 				 /*读返回数据*/  
                String conResult = EntityUtils.toString(response  
                        .getEntity()); 
-               if(conResult.startsWith("[")){
-            	   jsonArray = JSONArray.fromObject(conResult);
-            	   map.put("success", true);
-            	   map.put("entity", jsonArray);
-               }else if(conResult.startsWith("{")){
-                   sobj = JSONObject.fromObject(conResult);
-                   jsonArray = new JSONArray();
-                   jsonArray.add(sobj);
-                   map.put("success", true);
-                   map.put("entity", jsonArray);
-               }else{
-            	   map.put("success", true);
-            	   map.put("entity", conResult);
-               }
+//               if(conResult.startsWith("[")){
+//            	   jsonArray = JSONArray.fromObject(conResult);
+//            	   //map.put("success", true);
+//            	   map.put("entity", jsonArray);
+//               }else if(conResult.startsWith("{")){
+//                   sobj = JSONObject.fromObject(conResult);
+//                   jsonArray = new JSONArray();
+//                   jsonArray.add(sobj);
+//                  // map.put("success", true);
+//                   map.put("entity", jsonArray);
+//               }else{
+//            	   //map.put("success", true);
+//            	   map.put("entity", conResult);
+//               }
 //               String result = sobj.getString("token");  
 //               String code = sobj.getString("expire");  
 //               if(code.equals("3600")){  
@@ -205,31 +202,28 @@ public class HttpRequest {
 //               }else{  
 //                   strResult += "发送失败，"+code;  
 //               } 
+               strResult = conResult;
 			}else{
 				String err = response.getStatusLine().getStatusCode()+"";  
-				strResult += "调用接口失败:"+err; 
 				JSONArray array = new JSONArray();
 				JSONObject object = new JSONObject();
 				object.put("errInfo",strResult);
 				array.add(object);
-               map.put("success", false);
-               map.put("entity", strResult);
+               //map.put("success", false);
 			}
 		}  catch (NoRouteToHostException e){
 			//err 捕获超时异常
-			map.put("success", false);
-			map.put("entity", "调用接口超时");
+			//map.put("success", false);
 		} catch (UnsupportedEncodingException e) {
 			//捕获编码格式异常
 			e.printStackTrace();
 		} catch (ClientProtocolException e) {
 			// 客户端异常
-			map.put("success", false);
-			map.put("entity", "客户端异常");
+			//map.put("success", false);
 		} catch (IOException e) {
 			//流异常
 			e.printStackTrace();
 		}  
-        return map;  
+        return  strResult;  
 	}
 }

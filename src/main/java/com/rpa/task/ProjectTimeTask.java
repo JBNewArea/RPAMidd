@@ -38,15 +38,20 @@ public class ProjectTimeTask {
 	private LogInfo logInfo = null;
 	private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 	
-	private SimpleDateFormat projectParams = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
+	private SimpleDateFormat projectParams = new SimpleDateFormat("yyyy/MM/dd");//设置日期格式
+	private List<ProjectDeclare> project = new ArrayList<>();//系统缓存
+	
 	public void execute(){
-		System.out.println("进入");
-		doLog("project - execute","success:"+df.format(new Date()),"0");
-		String logres = login();
-		if(ProjectUtils.SUCCESS_CODE.equals(logres)){
-			queryList();
-		}
-		//doDeclare();
+//		System.out.println("进入");
+//		doLog("project - execute","success:"+df.format(new Date()),"0");
+//		String logres = login();
+//		if(ProjectUtils.SUCCESS_CODE.equals(logres)){
+//			queryList();
+//		}else{
+//			doLog("project - login","error:"+logres,"1");
+//		}
+//		System.out.println("***********************************************************************************************结束***************************"+project.size());
+		doDeclare();
 	}
 	
 	
@@ -71,7 +76,7 @@ public class ProjectTimeTask {
 	 */
 	@SuppressWarnings("unchecked")
 	public  void queryList(){
-		String params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page=1";//&datestart="+projectParams.format(new Date())
+		String params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page=1";//&datestart="+projectParams.format(new Date());
 		try {
 			String pageRes = HttpRequest.sendGet(ProjectUtils.LIST_URL, params);
 			//得到页数
@@ -82,22 +87,28 @@ public class ProjectTimeTask {
 				int allPage = Integer.parseInt(String.valueOf(pageObj.get("totlePage")));
 				String _res="";
 				if(allPage > 0){
-					//得到全部的页数，遍历请求地址
+					//得到全部的页数，遍历请求每页的地址
 					for (int i = 1; i <= allPage; i++) {
-						params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page="+i;//&datestart="+projectParams.format(new Date())
+						System.out.println("第"+i+"页");
+						params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_LIST+"&page="+i;//"&datestart="+projectParams.format(new Date());
 						_res = HttpRequest.sendGet(ProjectUtils.LIST_URL, params);
-						JSONObject _jsonObject =JSONObject.fromObject(_res);//得到本页列表
+						JSONObject _jsonObject =JSONObject.fromObject(_res);//得到本页列表数据
 						//判断列表不为空
-						if(null != _jsonObject){
+						if(null != _jsonObject&&ProjectUtils.SUCCESS_CODE.equals(_jsonObject.get("rtnCode"))){
 						    JSONObject _jsonObject1 = JSONObject.fromObject(_jsonObject.get("data"));
+						    System.out.println(_jsonObject1);
 						   //判断列表不为空 data
 						    if(null != _jsonObject1){
+						    	 int num = 1;
 						    	 JSONArray myJsonArray = JSONArray.fromObject(String.valueOf(_jsonObject1.get("proList")));
+						    	 //循环每页数据
 						    	 Iterator<Object> it = myJsonArray.iterator();
 						    	 while (it.hasNext()) {
 						    		 JSONObject ob = (JSONObject) it.next();
 						    		 if(StringUtils.isNotEmpty(String.valueOf(ob.get("uuid")))&&StringUtils.isNotEmpty(String.valueOf(ob.get("code")))){
 						    			 queryDetail(String.valueOf(ob.get("uuid")),String.valueOf(ob.get("code")),String.valueOf(ob.get("sbrq")),String.valueOf(ob.get("xmzt")));
+						    			 num++;
+						    			 System.out.println("第"+num+"条数据");
 						    		 }
 						    	 }
 						    }
@@ -119,13 +130,15 @@ public class ProjectTimeTask {
 	 */
 	public  void queryDetail(String uuid,String code,String sbsj,String xmzt){
 		String params="iw-apikey="+ProjectUtils.IW_APIKEY+"&iw-cmd="+ProjectUtils.IW_CMD_DETAIL+"&uuid="+uuid+"&code="+code;
+		ProjectDeclare p = null;
 		try {
 			String res = HttpRequest.sendGet(ProjectUtils.BYONE_URL, params);
 			JSONObject jsonObject=JSONObject.fromObject(res);
 			if(ProjectUtils.SUCCESS_CODE.equals(jsonObject.get("rtnCode"))){
 				  JSONObject _jsonObject=JSONObject.fromObject(jsonObject.get("data"));
-				  ProjectDeclare p = new ProjectDeclare();
-				  p.setProjectCode(code);
+				   p = new ProjectDeclare();
+				   p.setProjectCode(code);
+				   JSONArray myJsonArray = null;
 				  List<ProjectDeclare> list =  projectDeclareService.queryList(p);
 				  if(list.isEmpty()){
 					  p.setId(UUID.randomUUID().toString());
@@ -144,23 +157,38 @@ public class ProjectTimeTask {
 					  p.setProjectAttribute(_jsonObject.getString("xmsx"));
 					  p.setBuildNature(_jsonObject.getString("jsxz"));
 					  p.setTotalInvestment(_jsonObject.getString("ztz"));
-					  p.setBuildDetailPlace(_jsonObject.getString("jsgmjnr"));
+					  p.setScaleandinfo(_jsonObject.getString("jsgmjnr"));
 					  p.setSiteArea(_jsonObject.getString("ydmj"));
 					  p.setNewSiteArea(_jsonObject.getString("xzydmj"));
 					  p.setFarmingSiteArea(_jsonObject.getString("nydmj"));
-					  p.setProjectPrincipal(_jsonObject.getString("xmzbj"));
+					  p.setProjectCapital(_jsonObject.getString("xmzbj"));
 					  p.setCapitalSource(_jsonObject.getString("zjly"));
 					  p.setFinancialCapitalSource(_jsonObject.getString("czzjly"));
 					  p.setIsTechnically(_jsonObject.getString("sfjgxm"));
 					  p.setPutClassify(_jsonObject.getString("bamlfl"));
 					  p.setPutCatalog(_jsonObject.getString("baml"));
-					  p.setProjectLegalDetp(_jsonObject.getString("xmfrdw"));
-					  p.setProjectLegalLicenseType(_jsonObject.getString("xmfrzzlx"));
-					  p.setProjectLegalLicenseNum(_jsonObject.getString("xmfrzzhm"));
-					  p.setLinkman(_jsonObject.getString("lxr"));
-					  p.setLinktel(_jsonObject.getString("lxdh"));
+					  myJsonArray = JSONArray.fromObject(String.valueOf(_jsonObject.get("proList")));
+					  if(null !=myJsonArray){
+						     //循环每页数据
+						     int count = 0;
+					    	 Iterator<Object> it = myJsonArray.iterator();
+					    	 while (it.hasNext()) {
+					    		 if(count == 0){
+					    			 JSONObject ob = (JSONObject) it.next();
+						    		 p.setProjectLegalDetp(ob.getString("xmfrdw"));
+					    			 p.setProjectLegalLicenseType(ob.getString("xmfrzzlx"));
+					    			 p.setProjectLegalLicenseNum(ob.getString("xmfrzzhm"));
+					    			 p.setLinkman(ob.getString("lxr"));
+									 p.setLinktel(ob.getString("lxdh")); 
+					    		 }
+					    		 count++;
+					    	 }
+					  }
 					  p.setManageStatus(xmzt);
-					  projectDeclareService.insert(p);
+					  int ret = projectDeclareService.insert(p);
+					  if(ret > 0){
+						  project.add(p);
+					  }
 				  }
 			}
 		} catch (IOException e) {
@@ -176,15 +204,15 @@ public class ProjectTimeTask {
 		ProjectDeclare p = new ProjectDeclare();
 		List<Map<String,String>> filelist = doFaceMatter();
 		//增加测试时间参数
-		SimpleDateFormat _projectParams = new SimpleDateFormat("yyyy/MM/dd");
-		p.setDeclareDate(_projectParams.format(new Date()));
+		//SimpleDateFormat _projectParams = new SimpleDateFormat("yyyy/MM/dd");
+		//p.setDeclareDate("2018/09/12");
 		//全量执行
 		List<ProjectDeclare> list =  projectDeclareService.queryList(p);
 		if(!list.isEmpty()){
 			List<NameValuePair> nameValuePairs = null;
-			for (ProjectDeclare projectDeclare : list) {
+			for (int a = 0; a < list.size(); a++) {
+				ProjectDeclare projectDeclare = list.get(a);
 				nameValuePairs = new ArrayList<NameValuePair>();
-				if("备案".equals(projectDeclare.getProjectType())&&StringUtils.isNoneEmpty(projectDeclare.getProjectLegalLicenseType())&&!"其他".equals(projectDeclare.getProjectLegalLicenseType())){
 					//事项对应附件信息组装
 					if(!filelist.isEmpty()){
 						for (int i = 0;i<filelist.size();i++) {
@@ -199,6 +227,12 @@ public class ProjectTimeTask {
 				        nameValuePairs.add(new BasicNameValuePair("materialList[0].materialGetId",""));
 				        nameValuePairs.add(new BasicNameValuePair("materialList[0].getMode",""));
 					}
+					 nameValuePairs.add(new BasicNameValuePair("neiWaiType","2"));//外商投资类型 1 - 外资 2 - 内资
+					 nameValuePairs.add(new BasicNameValuePair("projecCode",projectDeclare.getProjectCode())); //项目代码
+					 nameValuePairs.add(new BasicNameValuePair("isBubanpro",""));//是否补办项目
+					 nameValuePairs.add(new BasicNameValuePair("prjectID",""));//投资项目ID标识
+					 
+					 
 			        nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationName",projectDeclare.getProjectLegalDetp()));
 			        nameValuePairs.add(new BasicNameValuePair("applicantDocumentType","2"));
 			        nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationDocumentNumber",projectDeclare.getProjectLegalLicenseNum()));
@@ -216,24 +250,26 @@ public class ProjectTimeTask {
 			        nameValuePairs.add(new BasicNameValuePair("express.postCode",""));
 			        nameValuePairs.add(new BasicNameValuePair("express.street",""));
 			        nameValuePairs.add(new BasicNameValuePair("express.address",""));
-			        nameValuePairs.add(new BasicNameValuePair("projectNumber",projectDeclare.getProjectCode()));
+			        nameValuePairs.add(new BasicNameValuePair("projectNumber",""));
 			        nameValuePairs.add(new BasicNameValuePair("concreteTrans",projectDeclare.getProjectName()));
-			        //自定义表单组装
-			        nameValuePairs.add(new BasicNameValuePair("projectType",projectDeclare.getProjectType()));//项目类型
+			        
+			        //自定义表单组装 - 内资
+			        nameValuePairs.add(new BasicNameValuePair("projectTypeNei",projectDeclare.getProjectType()));//项目类型
 			        nameValuePairs.add(new BasicNameValuePair("isNationSecurity",""));//是否涉及国家安全
-			        nameValuePairs.add(new BasicNameValuePair("projectAttribute",projectDeclare.getProjectAttribute()));//项目属性
+			        nameValuePairs.add(new BasicNameValuePair("projectAttributeNei",projectDeclare.getProjectAttribute()));//项目属性
 			        nameValuePairs.add(new BasicNameValuePair("investmentMethod",""));//投资方式
-			        nameValuePairs.add(new BasicNameValuePair("scaleandinfo",projectDeclare.getScaleandinfo()));//项目内容
+			        nameValuePairs.add(new BasicNameValuePair("scaleandinfoNei",projectDeclare.getScaleandinfo()));//项目内容
 			        nameValuePairs.add(new BasicNameValuePair("statusFirst",projectDeclare.getManageStatus()));//办理状态
-			        nameValuePairs.add(new BasicNameValuePair("buildDetailPlace",projectDeclare.getBuildDetailPlace()));//项目详细地址
-			        nameValuePairs.add(new BasicNameValuePair("guanli",projectDeclare.getGuanli()));//所属行业
-			        nameValuePairs.add(new BasicNameValuePair("money",projectDeclare.getTotalInvestment()));//总投资
+			        nameValuePairs.add(new BasicNameValuePair("buildDetailPlaceNei",projectDeclare.getBuildDetailPlace()));//项目详细地址
+			        nameValuePairs.add(new BasicNameValuePair("guanliNei",projectDeclare.getGuanli()));//所属行业
+			        nameValuePairs.add(new BasicNameValuePair("moneyNei",projectDeclare.getTotalInvestment()));//总投资
 			        nameValuePairs.add(new BasicNameValuePair("dollarMoney","")); //折合美元(万元)
 			        nameValuePairs.add(new BasicNameValuePair("dollarProjectCap","")); //折合美元(万元)
 			        nameValuePairs.add(new BasicNameValuePair("ExchangeMoney",""));//使用的汇率(人民币/美元)
 			        nameValuePairs.add(new BasicNameValuePair("ProjectCap",projectDeclare.getProjectPrincipal()));//项目本金
 			        nameValuePairs.add(new BasicNameValuePair("ExchangeProjectCap",""));//使用的汇率(人民币/美元)
 			        nameValuePairs.add(new BasicNameValuePair("ProjectCapName",""));//项目资本金投资者名称
+			        nameValuePairs.add(new BasicNameValuePair("ProjectCapNei",projectDeclare.getProjectCapital()));//项目资本金
 			        nameValuePairs.add(new BasicNameValuePair("regCountryArea",""));//注册国别地区
 			        nameValuePairs.add(new BasicNameValuePair("contribution",""));//出资额(万元)
 			        nameValuePairs.add(new BasicNameValuePair("fundedRatio","")); //出资比例%
@@ -242,24 +278,29 @@ public class ProjectTimeTask {
 			        nameValuePairs.add(new BasicNameValuePair("landMethod","")); //土地获取方式
 			        nameValuePairs.add(new BasicNameValuePair("landTotal",""));//总用地面积(平方米)
 			        nameValuePairs.add(new BasicNameValuePair("buildTotal",""));//总建筑面积(平方米)
-			        nameValuePairs.add(new BasicNameValuePair("expeStratTime",projectDeclare.getStartPlanDate()));//预计开工时间(年)/拟开工时间
-			        nameValuePairs.add(new BasicNameValuePair("expeEndTime",projectDeclare.getEndPlanDate()));//预计竣工时间(年)/拟建成时间
+			        nameValuePairs.add(new BasicNameValuePair("expeStratTimeNei",projectDeclare.getStartPlanDate()));//预计开工时间(年)/拟开工时间
+			        nameValuePairs.add(new BasicNameValuePair("expeEndTimeNei",projectDeclare.getEndPlanDate()));//预计竣工时间(年)/拟建成时间
 			        nameValuePairs.add(new BasicNameValuePair("isNewDevice",""));//是否新增设备
 			        nameValuePairs.add(new BasicNameValuePair("impNubAndAmount",""));//其中：拟进口设备数量及金额
 			        nameValuePairs.add(new BasicNameValuePair("isUnPrepar",""));//项目单位是否筹建中
 			        nameValuePairs.add(new BasicNameValuePair("proCatalogType",""));//项目目录分类
-			        nameValuePairs.add(new BasicNameValuePair("recCatalogType",projectDeclare.getPutClassify()));//备案目录分类
-			        nameValuePairs.add(new BasicNameValuePair("revCatalogType",""));//审核目录分类
-			        nameValuePairs.add(new BasicNameValuePair("assDate",projectDeclare.getGiveDate()));//赋码日期
-			        nameValuePairs.add(new BasicNameValuePair("assOffice",projectDeclare.getGiveDept()));//赋码部门
-			        nameValuePairs.add(new BasicNameValuePair("guobiao",projectDeclare.getGuobiao()));//国标行业
-			        nameValuePairs.add(new BasicNameValuePair("consNature",projectDeclare.getBuildNature()));//建设性质
-			        nameValuePairs.add(new BasicNameValuePair("landArea",projectDeclare.getSiteArea()));//用地面积（公顷）
-			        nameValuePairs.add(new BasicNameValuePair("addArea",projectDeclare.getNewSiteArea()));//新增用地面积（公顷
-			        nameValuePairs.add(new BasicNameValuePair("AgriculturalArea",projectDeclare.getFarmingSiteArea()));//农用地面积（公顷
-			        nameValuePairs.add(new BasicNameValuePair("funSocurce",projectDeclare.getCapitalSource()));//资金来源
-			        nameValuePairs.add(new BasicNameValuePair("finanFunSocurce",projectDeclare.getFinancialCapitalSource()));//财政资金来源
-			        nameValuePairs.add(new BasicNameValuePair("isTechRefPro",projectDeclare.getIsTechnically()));//是否技改项目
+			        //nameValuePairs.add(new BasicNameValuePair("catalogTypeNei",""));//目录分类
+			        nameValuePairs.add(new BasicNameValuePair("recCatalogTypeNei",projectDeclare.getPutClassify()));//备案目录分类
+			        nameValuePairs.add(new BasicNameValuePair("catalogBeianTypeNei",projectDeclare.getPutCatalog()));//备案目录
+			        nameValuePairs.add(new BasicNameValuePair("revCatalogTypeNei",""));//核准目录分类
+			        nameValuePairs.add(new BasicNameValuePair("catalogHezhunTypeNei",""));//核准目录
+			        nameValuePairs.add(new BasicNameValuePair("proCatalogTypeNei",""));//审核目录分类
+			        nameValuePairs.add(new BasicNameValuePair("catalogShenpiTypeNei",""));//审批目录
+			        nameValuePairs.add(new BasicNameValuePair("assDateNei",projectDeclare.getGiveDate()));//赋码日期
+			        nameValuePairs.add(new BasicNameValuePair("assOfficeNei",projectDeclare.getGiveDept()));//赋码部门
+			        nameValuePairs.add(new BasicNameValuePair("guobiaoNei",projectDeclare.getGuobiao()));//国标行业
+			        nameValuePairs.add(new BasicNameValuePair("consNatureNei",projectDeclare.getBuildNature()));//建设性质
+			        nameValuePairs.add(new BasicNameValuePair("landAreaNei",projectDeclare.getSiteArea()));//用地面积（公顷）
+			        nameValuePairs.add(new BasicNameValuePair("addAreaNei",projectDeclare.getNewSiteArea()));//新增用地面积（公顷
+			        nameValuePairs.add(new BasicNameValuePair("AgriculturalAreaNei",projectDeclare.getFarmingSiteArea()));//农用地面积（公顷
+			        nameValuePairs.add(new BasicNameValuePair("funSocurceNei",projectDeclare.getCapitalSource()));//资金来源
+			        nameValuePairs.add(new BasicNameValuePair("finanFunSocurceNei",projectDeclare.getFinancialCapitalSource()));//财政资金来源
+			        nameValuePairs.add(new BasicNameValuePair("isTechRefProNei",projectDeclare.getIsTechnically()));//是否技改项目
 			        nameValuePairs.add(new BasicNameValuePair("proNature",""));//项目单位性质
 			        nameValuePairs.add(new BasicNameValuePair("proRegAddress",""));//项目单位注册地址
 			        nameValuePairs.add(new BasicNameValuePair("businessScope",""));//主要经营范围
@@ -269,7 +310,13 @@ public class ProjectTimeTask {
 						//事项信息 - 企业投资建设固定资产投资项目备案
 						if(ProjectUtils.ISTECHNICALLY.equals(projectDeclare.getIsTechnically())){
 							 nameValuePairs.add(new BasicNameValuePair("trans.id","e8f74efb01ce443faf91f77c064ad781"));
-							 Map<String,Object> ret = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+							 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+							 JSONObject jsonObject=JSONObject.fromObject(res);
+							 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
+								 projectDeclare.setBjbh(String.valueOf(jsonObject.get("result")));
+								 int ret = projectDeclareService.updateBjbh(projectDeclare);
+								 //list.remove(a);
+							 }
 						}
 						
 					} catch (Exception e) {
@@ -279,7 +326,7 @@ public class ProjectTimeTask {
 					}
 				}
 			}
-		}
+			 
 	}
 	
 	/**

@@ -8,5 +8,6 @@ public interface IProjectDeclareService {
 	
 	public List<ProjectDeclare> queryList(ProjectDeclare dec); 
 	public int  insert(ProjectDeclare dec);
+	public int updateBjbh(ProjectDeclare dec);
 
 }
