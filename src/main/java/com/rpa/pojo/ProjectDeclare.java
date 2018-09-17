@@ -62,7 +62,7 @@ public class ProjectDeclare {
 	 * 备案 - 技改（非技改） - 外资（内资）
 	 * @return
 	 */
-	private String isNationalSecurity;//是否涉及国家安全
+	private String isNationalSecurity;//是否涉及国家安ei a全
 	private String investmentWay;//投资方式
 	private String otherInvestment;//其他投资方式需予以申报的情况
 	private String entryType;//适用于产业政策条目类型
@@ -97,9 +97,50 @@ public class ProjectDeclare {
 	private String checkCatalog;//核准目录
 	private String checkCatalogClassify;//核准目录分类
 	
+	/**
+	 * 备案 --待预审
+	 */
+	private String projectSplx;//项目审批类型
+	private String sfbbxm;//是否补办项目
+	private String lxrq;//立项日期
+	private String sumExplain;//总投资说明
+	
 	
 	private String bjbh;//推送备案接受 - 办件编号
 	
+ 
+	
+	public String getSumExplain() {
+		return sumExplain;
+	}
+
+	public void setSumExplain(String sumExplain) {
+		this.sumExplain = sumExplain;
+	}
+
+	public String getLxrq() {
+		return lxrq;
+	}
+
+	public void setLxrq(String lxrq) {
+		this.lxrq = lxrq;
+	}
+
+	public String getSfbbxm() {
+		return sfbbxm;
+	}
+
+	public void setSfbbxm(String sfbbxm) {
+		this.sfbbxm = sfbbxm;
+	}
+
+	public String getProjectSplx() {
+		return projectSplx;
+	}
+
+	public void setProjectSplx(String projectSplx) {
+		this.projectSplx = projectSplx;
+	}
 
 	public String getDeclareDate() {
 		return declareDate;

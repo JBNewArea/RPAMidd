@@ -67,6 +67,10 @@
 	<result property="checkCatalog" column="checkCatalog"/>
 	<result property="checkCatalogClassify" column="checkCatalogClassify"/>
 	<result property="bjbh" column="bjbh"/>
+	<result property="projectSplx" column="project_splx"/>
+	<result property="sfbbxm" column="sfbbxm"/>
+    <result property="lxrq" column="lxrq"/>
+    <result property="sumExplain" column="sumExplain"/>
 </resultMap>
 <sql id="Base_Column_List" >
     a.project_Type,
@@ -132,7 +136,11 @@
     a.linkNumber,
     a.email,
     a.checkCatalog,
-    a.checkCatalogClassify
+    a.checkCatalogClassify,
+    a.project_splx,
+    a.sfbbxm,
+    a.lxrq,
+    a.sumExplain
 </sql>
 <select id="queryList" resultMap="projectResultMap">
 	select <include refid="Base_Column_List"/>
@@ -209,7 +217,11 @@
 	linkNumber,
 	email,
 	checkCatalog,
-	checkCatalogClassify
+	checkCatalogClassify,
+	project_splx,
+	sfbbxm,
+	lxrq,
+	sumExplain
 	)VALUES(
 	#{id},
 	#{projectType},
@@ -274,7 +286,11 @@
 	#{linkNumber},
 	#{email},
 	#{checkCatalog},
-	#{checkCatalogClassify}
+	#{checkCatalogClassify},
+	#{projectSplx},
+	#{sfbbxm},
+	#{lxrq},
+	#{sumExplain}
 	)
 </insert>
 <update id="updateBjbh">
