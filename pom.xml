@@ -9,7 +9,7 @@
   <url>http://maven.apache.org</url>
   <properties>
   		<!-- spring版本号 -->
-		<spring.version>4.1.6.RELEASE</spring.version>
+		<spring.version>4.0.5.RELEASE</spring.version>
 		<!-- mybatis版本号 -->
 		<mybatis.version>3.2.6</mybatis.version>
 		<!-- log4j日志文件管理包版本 -->
@@ -17,7 +17,7 @@
 		<log4j.version>1.2.17</log4j.version>
 		<jdk.version>1.8</jdk.version>
 		<!-- 计划任务 -->
-		<quartz.version>2.2.1</quartz.version>
+		<quartz.version>1.8.6</quartz.version>
 		<jackson.version>2.2.3</jackson.version>
 		<commons-lang3.version>3.3.2</commons-lang3.version>
 		<mail.version>1.5.5</mail.version>

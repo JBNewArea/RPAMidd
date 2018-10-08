@@ -64,11 +64,27 @@ public class ProjectUtils {
 	/**
 	 * 事项 - 企业投资建设固定资产投资项目备案
 	 */
-	public final static String ISTECHNICALLY="否";
+	public final static String ISTECHNICALLY_NO="否";
+	public final static String ISTECHNICALLY_YES="是";
 	public final static String SP_SUCCESS="8888";
+	public final static String BEIAN_TYPE_NZ="备案";
+	public final static String HEZHUN_TYPE_HZ="核准";
+	public final static String NZ="内资";
+	public final static String WZ="外";
+	public final static String BANZ_TRANID_FJG="e8f74efb01ce443faf91f77c064ad781";
+	public final static String BANZ_TRANID_JG="8609ed41c75042f4ad8d49d307fd2250";
+	
+	public final static String HZ_TRANID_JG="7173168e8e1d48f5a828275f752c5234";
+	public final static String HZ_TRANID_FJG="789152c6f47f4f0989a5099d5d5d417a";
 	
 	public final static String PROJECT_ANTISTOP="统一社会信用";
 	public final static String PROJECT_ANTISTOP_1="其他";
+	
+	
+	/**
+	 * 企业投资建设固定资产投资项目备案   非技改 备案
+	 */
+	public final static String COMPANY_QY = "e8f74efb01ce443faf91f77c064ad781";
 	
 	
 	public static void downloadNet(String path) throws MalformedURLException {

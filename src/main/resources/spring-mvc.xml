@@ -47,26 +47,46 @@
         <!-- 内存中的最大值 -->
         <property name="maxInMemorySize" value="40960" />  
     </bean> 
-    <!-- 定义一个任务类 -->
-    <bean id="myJob" class="com.rpa.task.ProjectTimeTask"></bean>
-
+    <!-- 项目配置定时任务  -->
+    <bean id="myJob" class="com.rpa.task.ProjectPreliminaryTask"></bean>
     <!-- jobDetail -->
     <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="myJob"></property>
         <property name="targetMethod" value="execute"></property>
         <property name="concurrent" value="false" /><!-- 作业不并发调度  -->
     </bean>
-
     <!-- 定义trigger 触发器 -->
     <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="jobDetail"></property>
         <property name="cronExpression" value="*/5 * * * * ?"></property>
         <!--  0 0/20 5,18 * * ?-->
     </bean>
+    
+    
+    
+    <!-- 任务2配置 -->  
+    <bean name="proofJob" class="com.rpa.task.Proof"/>  
+    <bean id="jobDetail_2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <property name="targetObject">  
+            <ref bean="proofJob" />  
+        </property>  
+        <property name="targetMethod">  
+            <value>execute</value>  
+        </property>  
+    </bean>  
+    <bean id="cronTrigger_2" class="org.springframework.scheduling.quartz.CronTriggerBean">  
+        <property name="jobDetail">  
+            <ref bean="jobDetail_2" />  
+        </property>  
+        <property name="cronExpression">  
+            <value>0/1 * * * * ?</value>  
+        </property>  
+    </bean>  
     <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="triggers">
            <list>
                 <ref bean="cronTrigger"/>
+                <ref bean="cronTrigger_2"/>
            </list>
         </property>
     </bean>

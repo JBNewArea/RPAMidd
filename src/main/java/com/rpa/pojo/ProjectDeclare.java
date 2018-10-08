@@ -104,12 +104,144 @@ public class ProjectDeclare {
 	private String sfbbxm;//是否补办项目
 	private String lxrq;//立项日期
 	private String sumExplain;//总投资说明
+	private String policyTypes;//产品政策类型
+	private String industrialStructure;//产业结构调整指导目录
+	private String economicType;//经济类型
+	
+	private String applicationUnit;//申报单位
+	private String applicationeConomicType;//申报经济类型
+	private String applicationeLinceType;//事项申报证照类型
+	private String applicationeLinceNum;//事项申报证照号码
+	private String applicationeLinkMan;//申报联系人
+	private String applicationeLinkTel;//申报联系人
+	private String applicationeEmail;//申报电子邮件
+	private String projectUuid;//原系统主键
+	
+	private String projectCode_lj;//项目代码 - 逻辑
+	
 	
 	
 	private String bjbh;//推送备案接受 - 办件编号
+	private String isForeign;//业务逻辑判断  - 是否内外资
+	
+	private String aqscjdwh;//安全审查决定文号
+	private String isFixedAssets;//是否涉及新增固定资产投资
 	
  
 	
+	
+	public String getIsFixedAssets() {
+		return isFixedAssets;
+	}
+
+	public void setIsFixedAssets(String isFixedAssets) {
+		this.isFixedAssets = isFixedAssets;
+	}
+
+	public String getAqscjdwh() {
+		return aqscjdwh;
+	}
+
+	public void setAqscjdwh(String aqscjdwh) {
+		this.aqscjdwh = aqscjdwh;
+	}
+
+	public String getProjectCode_lj() {
+		return projectCode_lj;
+	}
+
+	public void setProjectCode_lj(String projectCode_lj) {
+		this.projectCode_lj = projectCode_lj;
+	}
+
+	public String getProjectUuid() {
+		return projectUuid;
+	}
+
+	public void setProjectUuid(String projectUuid) {
+		this.projectUuid = projectUuid;
+	}
+
+	public String getApplicationUnit() {
+		return applicationUnit;
+	}
+
+	public void setApplicationUnit(String applicationUnit) {
+		this.applicationUnit = applicationUnit;
+	}
+
+	public String getApplicationeConomicType() {
+		return applicationeConomicType;
+	}
+
+	public void setApplicationeConomicType(String applicationeConomicType) {
+		this.applicationeConomicType = applicationeConomicType;
+	}
+
+	public String getApplicationeLinceType() {
+		return applicationeLinceType;
+	}
+
+	public void setApplicationeLinceType(String applicationeLinceType) {
+		this.applicationeLinceType = applicationeLinceType;
+	}
+
+	public String getApplicationeLinceNum() {
+		return applicationeLinceNum;
+	}
+
+	public void setApplicationeLinceNum(String applicationeLinceNum) {
+		this.applicationeLinceNum = applicationeLinceNum;
+	}
+
+	public String getApplicationeLinkMan() {
+		return applicationeLinkMan;
+	}
+
+	public void setApplicationeLinkMan(String applicationeLinkMan) {
+		this.applicationeLinkMan = applicationeLinkMan;
+	}
+
+	public String getApplicationeLinkTel() {
+		return applicationeLinkTel;
+	}
+
+	public void setApplicationeLinkTel(String applicationeLinkTel) {
+		this.applicationeLinkTel = applicationeLinkTel;
+	}
+
+	public String getApplicationeEmail() {
+		return applicationeEmail;
+	}
+
+	public void setApplicationeEmail(String applicationeEmail) {
+		this.applicationeEmail = applicationeEmail;
+	}
+
+	public String getEconomicType() {
+		return economicType;
+	}
+
+	public void setEconomicType(String economicType) {
+		this.economicType = economicType;
+	}
+
+	public String getIndustrialStructure() {
+		return industrialStructure;
+	}
+
+	public void setIndustrialStructure(String industrialStructure) {
+		this.industrialStructure = industrialStructure;
+	}
+
+	public String getPolicyTypes() {
+		return policyTypes;
+	}
+
+	public void setPolicyTypes(String policyTypes) {
+		this.policyTypes = policyTypes;
+	}
+
 	public String getSumExplain() {
 		return sumExplain;
 	}
@@ -749,4 +881,13 @@ public class ProjectDeclare {
 	public void setBjbh(String bjbh) {
 		this.bjbh = bjbh;
 	}
+
+	public String getIsForeign() {
+		return isForeign;
+	}
+
+	public void setIsForeign(String isForeign) {
+		this.isForeign = isForeign;
+	}
+	
 }

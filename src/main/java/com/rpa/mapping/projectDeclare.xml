@@ -71,6 +71,24 @@
 	<result property="sfbbxm" column="sfbbxm"/>
     <result property="lxrq" column="lxrq"/>
     <result property="sumExplain" column="sumExplain"/>
+    <result property="policyTypes" column="policyTypes"/>
+    <result property="industrialStructure" column="industrialStructure"/>
+    <result property="economicType" column="economicType"/>
+    
+    <result property="applicationUnit" column="applicationUnit"/>
+    <result property="applicationeConomicType" column="applicationeConomicType"/>
+    <result property="applicationeLinceType" column="applicationeLinceType"/>
+    <result property="applicationeLinceNum" column="applicationeLinceNum"/>
+    <result property="applicationeLinkMan" column="applicationeLinkMan"/>
+    <result property="applicationeLinkTel" column="applicationeLinkTel"/>
+    <result property="applicationeEmail" column="applicationeEmail"/>
+    <result property="projectUuid" column="projectUuid"/>
+    <result property="projectCode_lj" column="projectCode_lj"/>
+    <result property="isForeign" column="isForeign"/>
+    <result property="aqscjdwh" column="aqscjdwh"/>
+    <result property="isFixedAssets" column="isFixedAssets"/>
+    
+    
 </resultMap>
 <sql id="Base_Column_List" >
     a.project_Type,
@@ -140,7 +158,22 @@
     a.project_splx,
     a.sfbbxm,
     a.lxrq,
-    a.sumExplain
+    a.sumExplain,
+    a.policyTypes,
+    a.industrialStructure,
+    a.economicType,
+    a.applicationUnit,
+    a.applicationeConomicType,
+    a.applicationeLinceType,
+    a.applicationeLinceNum,
+    a.applicationeLinkMan,
+    a.applicationeLinkTel,
+    a.applicationeEmail,
+    a.projectUuid,
+    a.projectCode_lj,
+    a.isForeign,
+    a.aqscjdwh,
+    a.isFixedAssets
 </sql>
 <select id="queryList" resultMap="projectResultMap">
 	select <include refid="Base_Column_List"/>
@@ -150,6 +183,9 @@
 	</if>
 	<if test="declareDate !=null and declareDate !=''">
 		and a.declareDate  = #{declareDate}
+	</if>
+	<if test="projectUuid !=null and projectUuid !=''">
+		and a.projectUuid  = #{projectUuid}
 	</if>
 </select>
 <insert id="insert">
@@ -221,7 +257,22 @@
 	project_splx,
 	sfbbxm,
 	lxrq,
-	sumExplain
+	sumExplain,
+	policyTypes,
+	industrialStructure,
+	economicType,
+	applicationUnit,
+	applicationeConomicType,
+	applicationeLinceType,
+	applicationeLinceNum,
+	applicationeLinkMan,
+	applicationeLinkTel,
+	applicationeEmail,
+	projectUuid,
+	projectCode_lj,
+	isForeign,
+	aqscjdwh,
+	isFixedAssets
 	)VALUES(
 	#{id},
 	#{projectType},
@@ -290,7 +341,22 @@
 	#{projectSplx},
 	#{sfbbxm},
 	#{lxrq},
-	#{sumExplain}
+	#{sumExplain},
+	#{policyTypes},
+	#{industrialStructure},
+	#{economicType},
+	#{applicationUnit},
+	#{applicationeConomicType},
+	#{applicationeLinceType},
+	#{applicationeLinceNum},
+	#{applicationeLinkMan},
+	#{applicationeLinkTel},
+	#{applicationeEmail},
+	#{projectUuid},
+	#{projectCode_lj},
+	#{isForeign},
+	#{aqscjdwh},
+	#{isFixedAssets}
 	)
 </insert>
 <update id="updateBjbh">

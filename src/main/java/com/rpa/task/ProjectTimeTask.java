@@ -308,7 +308,7 @@ public class ProjectTimeTask {
 			        nameValuePairs.add(new BasicNameValuePair("fax","")); //传真
 					try {
 						//事项信息 - 企业投资建设固定资产投资项目备案
-						if(ProjectUtils.ISTECHNICALLY.equals(projectDeclare.getIsTechnically())){
+						if(ProjectUtils.ISTECHNICALLY_NO.equals(projectDeclare.getIsTechnically())){
 							 nameValuePairs.add(new BasicNameValuePair("trans.id","e8f74efb01ce443faf91f77c064ad781"));
 							 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
 							 JSONObject jsonObject=JSONObject.fromObject(res);
