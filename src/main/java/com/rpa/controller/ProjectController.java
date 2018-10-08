@@ -2,20 +2,12 @@ package com.rpa.controller;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import com.rpa.pojo.ProjectDeclare;
-import com.rpa.service.IProjectDeclareService;
 import com.rpa.utils.ProjectUtils;
 import com.rpa.utils.http.HttpRequest;
 import net.sf.json.JSONArray;

@@ -6,18 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.annotation.Resource;
-import javax.management.StringValueExp;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-
 import com.rpa.pojo.ProjectDeclare;
 import com.rpa.service.ILogService;
 import com.rpa.service.IProjectDeclareService;
-import com.rpa.utils.CompanyUtils;
 import com.rpa.utils.ProjectUtils;
 import com.rpa.utils.http.HttpRequest;
 import net.sf.json.JSONArray;
