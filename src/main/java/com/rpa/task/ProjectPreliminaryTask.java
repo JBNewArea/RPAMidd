@@ -1,5 +1,10 @@
 package com.rpa.task;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,12 +12,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Resource;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
 import com.rpa.pojo.ProjectDeclare;
 import com.rpa.service.ILogService;
 import com.rpa.service.IProjectDeclareService;
+import com.rpa.utils.CompanyUtils;
 import com.rpa.utils.ProjectUtils;
 import com.rpa.utils.http.HttpRequest;
 import net.sf.json.JSONArray;
@@ -30,11 +46,12 @@ public class ProjectPreliminaryTask {
 	public IProjectDeclareService projectDeclareService;
 	
 	private List<ProjectDeclare> project = new ArrayList<>();//系统缓存
-	public void execute(){
-//		String logRes  = login();
-//		if(CompanyUtils.SUCCESS_CODE.equals(logRes)){
-//			pretralList();
-//		}
+	public void execute() throws IOException{
+		String logRes  = login();
+		if(CompanyUtils.SUCCESS_CODE.equals(logRes)){
+			pretralList();
+			System.out.println("进入执行");
+		}
 		doDeclare();
 	}
 	
@@ -129,6 +146,11 @@ public class ProjectPreliminaryTask {
 							      //内资
 							      if("0".equals(isForeign)){
 							    	  _jsonObject=JSONObject.fromObject( _jsonObject.get("nzInfo"));
+							    	  JSONArray jsonrray=(JSONArray) _jsonObject.get("fj");
+										 if(jsonrray.size()>0){
+											 p.setFilePath(jsonrray.getString(0));//附件地址
+											 System.out.println("文件地址"+jsonrray.getString(0)); 
+										 }
 								      p.setId(UUID.randomUUID().toString());
 									  p.setProjectUuid(projectUuid);
 									  p.setProjectSplx(_jsonObject.getString("xmsplx"));//项目审批类型
@@ -181,6 +203,11 @@ public class ProjectPreliminaryTask {
 							      //外资
 							      else if ("1".equals(isForeign)){
 							    	  _jsonObject=JSONObject.fromObject( _jsonObject.get("wzInfo"));
+							    	  JSONArray jsonrray=(JSONArray) _jsonObject.get("fj");
+										 if(jsonrray.size()>0){
+											 p.setFilePath(jsonrray.getString(0));//附件地址
+											 System.out.println("文件地址"+jsonrray.getString(0)); 
+										 }
 								      p.setId(UUID.randomUUID().toString());
 									  p.setProjectUuid(projectUuid);
 									  p.setProjectSplx(_jsonObject.getString("xmsplx"));//项目审批类型
@@ -207,6 +234,7 @@ public class ProjectPreliminaryTask {
 									  p.setProjectCapital(_jsonObject.getString("xmzbj"));//项目资本金
 									  p.setCapitalConvertDollar(_jsonObject.getString("zhmy1"));//项目资本金- 折合美元
 									  p.setCapitalParitiesRMBORDollar(_jsonObject.getString("syhl1"));//项目资本金 - 使用汇率
+									  p.setProjectDeptIsBuild(_jsonObject.getString("xmdwsfcjz"));//项目单位是否筹建中
 									  /**
 									   * 投资者名称-存在多个目前审批系统接口只能传一个参数 
 									   */
@@ -248,49 +276,86 @@ public class ProjectPreliminaryTask {
 						  if(ret > 0 ){
 							  project.add(p);
 						  }
-						  //得到附件数据
-//						  JSONArray myJsonArray = JSONArray.fromObject(String.valueOf(_jsonObject.get("fj")));
-//						  if(myJsonArray.size() >0){
-//							  for (int i = 0; i < myJsonArray.size(); i++) {
-//								System.out.println(myJsonArray.get(i));
-//								//ProjectUtils.downloadNet(String.valueOf(myJsonArray.get(i)));
-//							  }
-//						 }
+						 
 					}
 			 }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
 	/**
 	 * 执行 - 全量数据
 	 */
-	public void doDeclare(){
+	public void doDeclare() throws IOException{
+		System.out.println("——————————————————进入全量数据推送————————————————————");
 		List<Map<String,String>> filelist = doFaceMatter();
 		 ProjectDeclare p = new ProjectDeclare();
-		 p.setProjectUuid("14cb90bce2d8480bb4fdfbd7d4e472f3");
+		 //测试指定一条数据
+		 //p.setProjectUuid("14cb90bce2d8480bb4fdfbd7d4e472f3");
+		 p.setBjbh("1");
 		 List<ProjectDeclare> list =  projectDeclareService.queryList(p);
 		//全量执行
 		if(!list.isEmpty()){
 			List<NameValuePair> nameValuePairs = null;
+			String materialGetId = "";
 			for (int a = 0; a < list.size(); a++) {
 				ProjectDeclare projectDeclare = list.get(a);
+				if(projectDeclare.getFilePath() != null){
+					System.out.println("——————————————————开始上传附件————————————————————");
+					//下载附件
+					ProjectUtils.downloadNet(projectDeclare.getFilePath());
+					String fileType ="";
+		        	String[] strs=projectDeclare.getFilePath().split("\\.");
+		        	for(int i=0,len=strs.length;i<len;i++){
+		        	  System.out.println(strs[i].toString());
+		        	  fileType =strs[i].toString();
+		        	}
+		        	String downliadPath = "C:/downloadNet/file."+fileType;
+				    File f = new File(downliadPath);
+				    
+				    FileItem fileItem = new DiskFileItem("mainFile", Files.probeContentType(f.toPath()), false, f.getName(), (int) f.length(), f.getParentFile());
+				    try (InputStream input = new FileInputStream(f); OutputStream os = fileItem.getOutputStream();) {
+				        IOUtils.copy(input, os);
+				        MultipartFile mulFile = new CommonsMultipartFile(fileItem);
+				        if (null != mulFile && mulFile.getSize() != 0) {
+				        	//上传材料
+				        	Map<String,String> map = new HashMap<String,String>();
+							map.put("userIdCard","");
+							map.put("comeType","");
+							map.put("id","");
+							map.put("userType","2");
+							map.put("materialId","");
+				        	materialGetId = HttpRequest.fileUpload(ProjectUtils.INTERFACEURL+ProjectUtils.ONLIEN_MATERITALSAVE_URL, map, mulFile);
+			                System.out.println("返回材料id="+materialGetId);
+			                System.out.println("——————————————————上传结束————————————————————");
+			            }
+				    }
 						nameValuePairs = new ArrayList<NameValuePair>();
 						//事项对应附件信息组装
 						if(!filelist.isEmpty()){
 							for (int i = 0;i<filelist.size();i++) {
-								nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.id",filelist.get(i).get("id")));
-						        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.materialName",filelist.get(i).get("materialName")));
-						        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].materialGetId",""));
-						        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].getMode",""));
+								if(filelist.get(i).get("materialName").equals("江苏省企业投资项目承诺书")){
+									nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.id",filelist.get(i).get("id")));
+							        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.materialName",filelist.get(i).get("materialName")));
+							        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].materialGetId",materialGetId));
+							        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].getMode",""));
+								}else{
+									nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.id",filelist.get(i).get("id")));
+							        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.materialName",filelist.get(i).get("materialName")));
+							        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].materialGetId",""));
+							        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].getMode",""));
+								}
 							}
-						}else{
-							nameValuePairs.add(new BasicNameValuePair("materialList[0].material.id",""));
-					        nameValuePairs.add(new BasicNameValuePair("materialList[0].material.materialName",""));
-					        nameValuePairs.add(new BasicNameValuePair("materialList[0].materialGetId",""));
-					        nameValuePairs.add(new BasicNameValuePair("materialList[0].getMode",""));
 						}
+				}else{
+					nameValuePairs = new ArrayList<NameValuePair>();
+					for (int i = 0;i<filelist.size();i++) {
+							nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.id",filelist.get(i).get("id")));
+					        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].material.materialName",filelist.get(i).get("materialName")));
+					        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].materialGetId",""));
+					        nameValuePairs.add(new BasicNameValuePair("materialList["+i+"].getMode",""));
+					}
+				}
 						/**
 						 * 投资类型 
 						 */
@@ -307,21 +372,23 @@ public class ProjectPreliminaryTask {
 							 nameValuePairs.add(new BasicNameValuePair("buildDetailPlaceNei",StringUtils.isEmpty(projectDeclare.getBuildDetailPlace())?"":projectDeclare.getBuildDetailPlace()));//项目详细地址
 							 nameValuePairs.add(new BasicNameValuePair("moneyNei",StringUtils.isEmpty(projectDeclare.getTotalInvestment())?"":projectDeclare.getTotalInvestment()));//总投资
 							 nameValuePairs.add(new BasicNameValuePair("expeStratTimeNei",StringUtils.isEmpty(projectDeclare.getStartPlanDate())?"":projectDeclare.getStartPlanDate()));//预计开工时间(年)/拟开工时间
-						        nameValuePairs.add(new BasicNameValuePair("expeEndTimeNei",StringUtils.isEmpty(projectDeclare.getEndPlanDate())?"":projectDeclare.getEndPlanDate()));//预计竣工时间(年)/拟建成时间
+						     nameValuePairs.add(new BasicNameValuePair("expeEndTimeNei",StringUtils.isEmpty(projectDeclare.getEndPlanDate())?"":projectDeclare.getEndPlanDate()));//预计竣工时间(年)/拟建成时间
+							 nameValuePairs.add(new BasicNameValuePair("ProjectCapNei",StringUtils.isEmpty(projectDeclare.getProjectCapital())?"":projectDeclare.getProjectCapital()));//项目资本金
 						}else if("1".equals(projectDeclare.getIsForeign())){
 							nameValuePairs.add(new BasicNameValuePair("neiWaiType","1"));//外商投资类型 1 - 外资 2 - 内资
-							nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationDocumentNumber",projectDeclare.getApplicationeLinkTel()));
+							nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationDocumentNumber",projectDeclare.getApplicationeLinceNum()));
 							nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationName",projectDeclare.getApplicationeLinkMan()));
 							nameValuePairs.add(new BasicNameValuePair("applyPerson.applicationPhone",projectDeclare.getApplicationeLinkTel()));
 							nameValuePairs.add(new BasicNameValuePair("projectType",StringUtils.isEmpty(projectDeclare.getProjectType())?"":projectDeclare.getProjectType()));//项目类型
 							nameValuePairs.add(new BasicNameValuePair("scaleandinfo",StringUtils.isEmpty(projectDeclare.getScaleandinfo())?"":projectDeclare.getScaleandinfo()));//项目内容
 							nameValuePairs.add(new BasicNameValuePair("projectAttribute",StringUtils.isEmpty(projectDeclare.getProjectAttribute())?"":projectDeclare.getProjectAttribute()));//项目属性
 							nameValuePairs.add(new BasicNameValuePair("guobiao",StringUtils.isEmpty(projectDeclare.getGuobiao())?"":projectDeclare.getGuobiao()));//国标行业
-							nameValuePairs.add(new BasicNameValuePair("guanli",StringUtils.isEmpty(projectDeclare.getGuanli())?"":projectDeclare.getGuanli()));//所属行业
+							nameValuePairs.add(new BasicNameValuePair("guanli",StringUtils.isEmpty(projectDeclare.getIndustryInvolved())?"":projectDeclare.getIndustryInvolved()));//所属行业
 							nameValuePairs.add(new BasicNameValuePair("buildDetailPlace",StringUtils.isEmpty(projectDeclare.getBuildDetailPlace())?"":projectDeclare.getBuildDetailPlace()));//项目详细地址
 							nameValuePairs.add(new BasicNameValuePair("money",StringUtils.isEmpty(projectDeclare.getTotalInvestment())?"":projectDeclare.getTotalInvestment()));//总投资
 							nameValuePairs.add(new BasicNameValuePair("expeStratTime",StringUtils.isEmpty(projectDeclare.getStartPlanDate())?"":projectDeclare.getStartPlanDate()));//预计开工时间(年)/拟开工时间
 						    nameValuePairs.add(new BasicNameValuePair("expeEndTime",StringUtils.isEmpty(projectDeclare.getEndPlanDate())?"":projectDeclare.getEndPlanDate()));//预计竣工时间(年)/拟建成时间
+						    nameValuePairs.add(new BasicNameValuePair("ProjectCap",StringUtils.isEmpty(projectDeclare.getProjectCapital())?"":projectDeclare.getProjectCapital()));//项目本金
 						}
 						nameValuePairs.add(new BasicNameValuePair("projecCode",StringUtils.isEmpty(projectDeclare.getProjectCode())?"":projectDeclare.getProjectCode())); //项目代码
 						nameValuePairs.add(new BasicNameValuePair("isBubanpro",projectDeclare.getSfbbxm()));//是否补办项目
@@ -350,9 +417,9 @@ public class ProjectPreliminaryTask {
 				        nameValuePairs.add(new BasicNameValuePair("statusFirst",StringUtils.isEmpty(projectDeclare.getManageStatus())?"":projectDeclare.getManageStatus()));//办理状态
 				        nameValuePairs.add(new BasicNameValuePair("dollarMoney",StringUtils.isEmpty(projectDeclare.getTotalConvertDollar())?"":projectDeclare.getTotalConvertDollar())); //折合美元(万元)
 				        nameValuePairs.add(new BasicNameValuePair("ExchangeMoney",StringUtils.isEmpty(projectDeclare.getTotalParitiesRMBorDollar())?"":projectDeclare.getTotalParitiesRMBorDollar()));//使用的汇率(人民币/美元)
-				        nameValuePairs.add(new BasicNameValuePair("ProjectCap",StringUtils.isEmpty(projectDeclare.getProjectPrincipal())?"":projectDeclare.getProjectPrincipal()));//项目本金
+				       
 				        nameValuePairs.add(new BasicNameValuePair("ProjectCapName",StringUtils.isEmpty(projectDeclare.getInvestorName())?"":projectDeclare.getInvestorName()));//项目资本金投资者名称
-				        nameValuePairs.add(new BasicNameValuePair("ProjectCapNei",StringUtils.isEmpty(projectDeclare.getProjectCapital())?"":projectDeclare.getProjectCapital()));//项目资本金
+				       
 				        nameValuePairs.add(new BasicNameValuePair("dollarProjectCap",StringUtils.isEmpty(projectDeclare.getCapitalConvertDollar())?"":projectDeclare.getCapitalConvertDollar())); //折合美元(万元)
 				        nameValuePairs.add(new BasicNameValuePair("ExchangeProjectCap",StringUtils.isEmpty(projectDeclare.getCapitalParitiesRMBORDollar())?"":projectDeclare.getCapitalParitiesRMBORDollar()));//使用的汇率(人民币/美元)
 				        
@@ -366,9 +433,9 @@ public class ProjectPreliminaryTask {
 				        nameValuePairs.add(new BasicNameValuePair("buildTotal",StringUtils.isEmpty(projectDeclare.getSumCoveredArea())?"":projectDeclare.getSumCoveredArea()));//总建筑面积(平方米)
 				        nameValuePairs.add(new BasicNameValuePair("isNewDevice",StringUtils.isEmpty(projectDeclare.getIsAddEquipment())?"":projectDeclare.getIsAddEquipment()));//是否新增设备
 				        nameValuePairs.add(new BasicNameValuePair("impNubAndAmount",StringUtils.isEmpty(projectDeclare.getImportedEquipmentAndMoney())?"":projectDeclare.getImportedEquipmentAndMoney()));//其中：拟进口设备数量及金额
-				        nameValuePairs.add(new BasicNameValuePair("isUnPrepar",StringUtils.isEmpty(projectDeclare.getPolicyTypes())?"":projectDeclare.getPolicyTypes()));//适用产业政策条目
+				        nameValuePairs.add(new BasicNameValuePair("policyEntry",StringUtils.isEmpty(projectDeclare.getIndustrialStructure())?"":projectDeclare.getIndustrialStructure()));//适用产业政策条目
 				        
-				        nameValuePairs.add(new BasicNameValuePair("policyEntry",StringUtils.isEmpty(projectDeclare.getProjectDeptIsBuild())?"":projectDeclare.getProjectDeptIsBuild()));//项目单位是否筹建中
+				        nameValuePairs.add(new BasicNameValuePair("isUnPrepar",StringUtils.isEmpty(projectDeclare.getProjectDeptIsBuild())?"":projectDeclare.getProjectDeptIsBuild()));//项目单位是否筹建中
 				        
 				        nameValuePairs.add(new BasicNameValuePair("otherDecl",""));//其他投资方式需给予申报的情况
 				        nameValuePairs.add(new BasicNameValuePair("importEqmentMoeny",StringUtils.isEmpty(projectDeclare.getImportedEquipmentAndMoney())?"":projectDeclare.getImportedEquipmentAndMoney()));//项其中:拟进口设备数量及金额
@@ -403,10 +470,23 @@ public class ProjectPreliminaryTask {
 							//企业技术改造项目备案 - 技改 备案 8609ed41c75042f4ad8d49d307fd2250
 							
 							/**
-							 *  非技改/技改 备案项目 内资
+							 *  技改 备案 内资
 							 */
-							if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&projectDeclare.getIsForeign().equals("0")){
-								 nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_FJG));
+							if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&ProjectUtils.ISTECHNICALLY_YES.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("0")){
+								 nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_JG));
+								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+								 JSONObject jsonObject=JSONObject.fromObject(res);
+								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
+									 projectDeclare.setBjbh("1");
+									 int ret = projectDeclareService.updateBjbh(projectDeclare);
+									 System.out.println("非技改/技改 备案项目 内资"+ret);
+								 }
+							}
+							/**
+							 * 非技改 备案 内资 
+							 */
+							else if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&ProjectUtils.ISTECHNICALLY_NO.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("0")){
+								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_FJG));
 								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
 								 JSONObject jsonObject=JSONObject.fromObject(res);
 								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
@@ -414,22 +494,24 @@ public class ProjectPreliminaryTask {
 									 int ret = projectDeclareService.updateBjbh(projectDeclare);
 								 }
 							}
-//							/**
-//							 * 非技改 备案项目 外资
-//							 */
-//							else if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&ProjectUtils.ISTECHNICALLY_NO.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("1")){
-//								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_FJG));
-//								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
-//								 JSONObject jsonObject=JSONObject.fromObject(res);
-//								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
-//									 projectDeclare.setBjbh("1");
-//									 int ret = projectDeclareService.updateBjbh(projectDeclare);
-//								 }
-//							}
+							
 							/**
-							 * 技改/非技改 备案项目 内资
+							 * 非技改 备案 外资
 							 */
-							else if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&projectDeclare.getIsForeign().equals("0")){
+							else if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&ProjectUtils.ISTECHNICALLY_NO.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("1")){
+								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_FJG));
+								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+								 JSONObject jsonObject=JSONObject.fromObject(res);
+								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
+									 projectDeclare.setBjbh("1");
+									 int ret = projectDeclareService.updateBjbh(projectDeclare);
+								 }
+							}
+							
+							/**
+							 * 技改 备案 外资
+							 */
+							else if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&ProjectUtils.ISTECHNICALLY_YES.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("1")){
 								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_JG));
 								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
 								 JSONObject jsonObject=JSONObject.fromObject(res);
@@ -438,42 +520,68 @@ public class ProjectPreliminaryTask {
 									 int ret = projectDeclareService.updateBjbh(projectDeclare);
 								 }
 							}
+							
+							
+							
+							
 							/**
-							 *  技改 备案 外资
+							 * 技改 核准 内资
 							 */
-//							else if(projectDeclare.getProjectType().indexOf(ProjectUtils.BEIAN_TYPE_NZ)!=-1&&projectDeclare.getIsForeign().equals("1")){
-//								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.BANZ_TRANID_FJG));
-//								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
-//								 JSONObject jsonObject=JSONObject.fromObject(res);
-//								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
-//									 projectDeclare.setBjbh("1");
-//									 int ret = projectDeclareService.updateBjbh(projectDeclare);
-//								 }
-//							}
-							/**
-							 * 核准 内资
-							 */
-							if(projectDeclare.getProjectType().indexOf(ProjectUtils.HEZHUN_TYPE_HZ)!=-1&&projectDeclare.getIsForeign().equals("0")){
+							if(projectDeclare.getProjectType().indexOf(ProjectUtils.HEZHUN_TYPE_HZ)!=-1&&ProjectUtils.ISTECHNICALLY_YES.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("0")){
 								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.HZ_TRANID_JG));
 								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
 								 JSONObject jsonObject=JSONObject.fromObject(res);
 								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
 									 projectDeclare.setBjbh("1");
 									 int ret = projectDeclareService.updateBjbh(projectDeclare);
+									 System.out.println("核准 内资"+ret);
 								 }
 							}
 							/**
-							 * 核准 外资
+							 * 非技改 核准  内资
 							 */
-							if(projectDeclare.getProjectType().indexOf(ProjectUtils.HEZHUN_TYPE_HZ)!=-1&&projectDeclare.getIsForeign().equals("1")){
+							if(projectDeclare.getProjectType().indexOf(ProjectUtils.HEZHUN_TYPE_HZ)!=-1&&ProjectUtils.ISTECHNICALLY_NO.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("0")){
 								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.HZ_TRANID_FJG));
 								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
 								 JSONObject jsonObject=JSONObject.fromObject(res);
 								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
 									 projectDeclare.setBjbh("1");
 									 int ret = projectDeclareService.updateBjbh(projectDeclare);
+									 System.out.println("核准 外资"+ret);
 								 }
 							}
+							
+							
+							/**
+							 * 技改 核准  外资
+							 */
+							if(projectDeclare.getProjectType().indexOf(ProjectUtils.HEZHUN_TYPE_HZ)!=-1&&ProjectUtils.ISTECHNICALLY_YES.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("1")){
+								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.HZ_TRANID_JG));
+								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+								 JSONObject jsonObject=JSONObject.fromObject(res);
+								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
+									 projectDeclare.setBjbh("1");
+									 int ret = projectDeclareService.updateBjbh(projectDeclare);
+									 System.out.println("核准 外资"+ret);
+								 }
+							}
+							
+							/**
+							 * 非技改 核准  外资
+							 */
+							if(projectDeclare.getProjectType().indexOf(ProjectUtils.HEZHUN_TYPE_HZ)!=-1&&ProjectUtils.ISTECHNICALLY_NO.equals(projectDeclare.getIsTechnically())&&projectDeclare.getIsForeign().equals("1")){
+								nameValuePairs.add(new BasicNameValuePair("trans.id",ProjectUtils.HZ_TRANID_FJG));
+								 String res = HttpRequest.send(ProjectUtils.INTERFACEURL+ProjectUtils.SAVEBJ, nameValuePairs);
+								 JSONObject jsonObject=JSONObject.fromObject(res);
+								 if(null!=jsonObject && ProjectUtils.SP_SUCCESS.equals(String.valueOf(jsonObject.get("code")))){
+									 projectDeclare.setBjbh("1");
+									 int ret = projectDeclareService.updateBjbh(projectDeclare);
+									 System.out.println("核准 外资"+ret);
+								 }
+							}
+							
+							
+							
 						} catch (Exception e) {
 							e.printStackTrace();
 							System.out.println(e.getMessage());
@@ -522,3 +630,4 @@ public class ProjectPreliminaryTask {
 		return list;
 	}
 }
+

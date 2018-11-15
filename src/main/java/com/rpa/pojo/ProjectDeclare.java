@@ -57,7 +57,16 @@ public class ProjectDeclare {
 	private String linktel;//联系手机
 	private String projectState;//项目状态
 	private String manageStatus;//办理状态
+	private String filePath;//附件地址
 	
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
 	/**
 	 * 备案 - 技改（非技改） - 外资（内资）
 	 * @return
@@ -105,7 +114,7 @@ public class ProjectDeclare {
 	private String lxrq;//立项日期
 	private String sumExplain;//总投资说明
 	private String policyTypes;//产品政策类型
-	private String industrialStructure;//产业结构调整指导目录
+	private String industrialStructure;//产业结构调整指导目录    //外资 适用产业政策条目 调用
 	private String economicType;//经济类型
 	
 	private String applicationUnit;//申报单位

@@ -11,7 +11,7 @@ import com.rpa.utils.ProjectUtils;
 
 public class TimeTask {
 
-	@Resource
+/*	@Resource
 	public IUserService userService;
 	@Resource
 	public IProjectDeclareService projectDeclareService;
@@ -24,6 +24,6 @@ public class TimeTask {
 	        if(ProjectUtils.SUCCESS_CODE.equals(logres)){
 	        	ProjectController.queryList();
 			}
-	    }
+	    }*/
 
 }

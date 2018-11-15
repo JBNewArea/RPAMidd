@@ -87,11 +87,10 @@
     <result property="isForeign" column="isForeign"/>
     <result property="aqscjdwh" column="aqscjdwh"/>
     <result property="isFixedAssets" column="isFixedAssets"/>
-    
+    <result property="filePath" column="filePath"/>
     
 </resultMap>
 <sql id="Base_Column_List" >
-    a.project_Type,
     a.project_Type,
     a.project_Name,
     a.mainProject_Name,
@@ -173,6 +172,8 @@
     a.projectCode_lj,
     a.isForeign,
     a.aqscjdwh,
+    a.filePath,
+    a.bjbh,
     a.isFixedAssets
 </sql>
 <select id="queryList" resultMap="projectResultMap">
@@ -186,6 +187,9 @@
 	</if>
 	<if test="projectUuid !=null and projectUuid !=''">
 		and a.projectUuid  = #{projectUuid}
+	</if>
+	<if test="bjbh !=null and bjbh !=''">
+		and a.bjbh IS NULL
 	</if>
 </select>
 <insert id="insert">
@@ -272,6 +276,7 @@
 	projectCode_lj,
 	isForeign,
 	aqscjdwh,
+	filePath,
 	isFixedAssets
 	)VALUES(
 	#{id},
@@ -356,10 +361,11 @@
 	#{projectCode_lj},
 	#{isForeign},
 	#{aqscjdwh},
+	#{filePath},
 	#{isFixedAssets}
 	)
 </insert>
 <update id="updateBjbh">
-	update project_declare set bjbh = #{bjbh} where projectCode = #{projectCode}
+	update project_declare set bjbh = #{bjbh} where projectUuid = #{projectUuid}
 </update>
 </mapper>

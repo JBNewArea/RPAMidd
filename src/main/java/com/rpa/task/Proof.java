@@ -13,7 +13,6 @@ import com.rpa.utils.CompanyUtils;
 public class Proof {
 
 	public void execute(){
-		System.out.println(345);
 	}
 	
 	public static void main(String[] args) {

@@ -25,11 +25,16 @@ public class ProjectUtils {
 	public final static String LIST_URL="http://10.101.79.24:11002/zwService/";
 	
 	public final static String BYONE_URL="http://10.101.79.24:11002/zwService/";
+	/**
+	 * 单个事项上传材料
+	 */
+	public final static String ONLIEN_MATERITALSAVE_URL="userMaterial/userMaterial/save";
 	
 	/**
 	 * 接口项目地址
 	 */
 	public final static String INTERFACEURL="http://221.226.86.27:8090/xzsp-interface/a/rpc/";
+	//public final static String INTERFACEURL="http://59.83.223.11:8099/xzsp-interface/a/rpc/";
 	public final static String MATTERINFO_URL="http://221.226.86.27:8090/xzsp-interface/a/rpc/trans/trans/showList";
 	
 	public final static String SAVEBJ="application/application/save";
@@ -93,9 +98,16 @@ public class ProjectUtils {
         int byteread = 0;
         URL url = new URL(path);
         try {
+        	String fileType ="";
+        	String[] strs=path.split("\\.");
+        	for(int i=0,len=strs.length;i<len;i++){
+        	  System.out.println(strs[i].toString());
+        	  fileType =strs[i].toString();
+        	}
+        	String downliadPath = "C:/downloadNet/file."+fileType;
             URLConnection conn = url.openConnection();
             InputStream inStream = conn.getInputStream();
-            FileOutputStream fs = new FileOutputStream("/Users/Arthur/Desktop/qqq.jpg");
+            FileOutputStream fs = new FileOutputStream(downliadPath);
 
             byte[] buffer = new byte[1204];
             int length;
@@ -110,4 +122,12 @@ public class ProjectUtils {
             e.printStackTrace();
         }
     }
+	public static void main(String[] args) {
+		try {
+			downloadNet("http://10.101.79.24/files/e58c963196cb4a66b22768584c7ffe27.pdf");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
